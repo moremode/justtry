@@ -1,0 +1,35 @@
+﻿version: '3.4'
+
+networks:
+  justtry-dev:
+    driver: bridge 
+
+services:
+  justtry:
+    depends_on:
+      - "postgres_image"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7111:80"
+    networks:
+      - justtry-dev  
+  
+  postgres_image:
+    image: postgres:latest
+    ports:
+      - "7112:5432"
+    restart: always
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+      - ./dbscripts/seed.sql :/docker-entrypoint-initdb.d/seed.sql
+    environment:
+      POSTGRES_USER: "thesage"
+      POSTGRES_PASSWORD: "ponponpon"
+      POSTGRES_DB: "userdb"
+    networks:
+      - justtry-dev
+
+volumes:
+  db_volume:
